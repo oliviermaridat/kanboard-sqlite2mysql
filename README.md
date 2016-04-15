@@ -32,7 +32,7 @@ Then backup your Kanboard data:
 
 And finally create the SQL dump file compatible with MySQL:
 
-    ./kanbord-sqlite2mysql.sh <Kanboard instance physical path> > db-mysql.sql
+    ./kanbord-sqlite2mysql.sh <Kanboard instance physical path> -o db-mysql.sql
 
 Or you can also directly apply it to the MySQL database of your choice:
 

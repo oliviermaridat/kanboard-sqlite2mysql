@@ -13,8 +13,9 @@ usage()
 	 -h, --host		MySQL database host
 	 -u, --user		MySQL database user for login
 	 -o, --output		Path to the output SQL dump compatible with MySQL
+	 -v, --verbose		Enable more verbosity
 	 -H, --help		Display this help
-	 -v, --version		Display the Kanboard SQLite2MySQL version
+	 -V, --version		Display the Kanboard SQLite2MySQL version
 
 	Example:
 	 $PROGNAME /usr/local/share/www/kanboard -o db-mysql.sql
@@ -38,6 +39,7 @@ cmdline()
   DB_PASSWORD=
   DB_NAME=
   OUTPUT_FILE=db-mysql.sql
+  IS_VERBOSE=0
   if [ "$#" -lt "1" ]; then
     echo 'error: missing arguments'
     usage
@@ -70,11 +72,15 @@ cmdline()
       DB_PASSWORD=$1
       shift
       ;;
+    -v | --verbose )
+      shift
+      IS_VERBOSE=1
+      ;;
     -H | --help )
       usage
       exit 0
       ;;
-    -v | --version )
+    -V | --version )
       version
       exit 0
       ;;
@@ -140,6 +146,7 @@ sqlite_dump_table_data()
     local sqliteDbFile=$1
     local table=$2
     local columns=`sqlite_columns ${sqliteDbFile} ${table}`
+    
     echo -e ".mode insert ${table}\nselect * from ${table};" \
         | sqlite3 ${sqliteDbFile} \
         | sed -e "s/INSERT INTO \([a-z_]*\)/INSERT INTO \1 (${columns})/"
@@ -150,11 +157,15 @@ sqlite_dump_table_data()
 sqlite_dump_data()
 {
     local sqliteDbFile=$1
-    local prioritizedTables='projects columns links groups users tasks task_has_links subtasks comments actions'
+    local prioritizedTables='plugin_schema_versions projects columns links groups users tasks task_has_links subtasks comments actions'
     for t in $prioritizedTables; do
+        # Please do not ask why: this TRUNCATE is already done elsewhere, but this table "plugin_schema_versions" seems to be refillld I don't know where... This fix the issue
+        if [ "plugin_schema_versions" == "${t}" ]; then
+            echo 'TRUNCATE TABLE plugin_schema_versions;'
+        fi
         sqlite_dump_table_data ${sqliteDbFile} ${t}
     done
-    for t in $(sqlite_tables ${sqliteDbFile} | grep -v -e projects -e columns -e links -e groups -e users -e tasks -e task_has_links -e subtasks -e comments -e actions); do
+    for t in $(sqlite_tables ${sqliteDbFile} | sed -e '/^plugin_schema_versions$/d' -e '/^projects$/d' -e '/^columns$/d' -e '/^links$/d' -e '/^groups$/d' -e '/^users$/d' -e '/^tasks$/d' -e '/^task_has_links$/d' -e '/^subtasks$/d' -e '/^comments$/d' -e '/^actions$/d'); do
         sqlite_dump_table_data ${sqliteDbFile} ${t}
     done
 }
@@ -164,18 +175,18 @@ createMysqlDump()
     local sqliteDbFile=$1
     
     echo 'ALTER TABLE users ADD COLUMN is_admin INT DEFAULT 0;
-ALTER TABLE users ADD COLUMN default_project_id INT DEFAULT 0;
-ALTER TABLE users ADD COLUMN is_project_admin INT DEFAULT 0;
-ALTER TABLE tasks ADD COLUMN estimate_duration VARCHAR(255) DEFAULT "";
-ALTER TABLE tasks ADD COLUMN actual_duration VARCHAR(255) DEFAULT "";
-ALTER TABLE project_has_users ADD COLUMN id INT DEFAULT 0;
-ALTER TABLE project_has_users ADD COLUMN is_owner INT DEFAULT 0;
-SET FOREIGN_KEY_CHECKS = 0;
-TRUNCATE TABLE settings;
-TRUNCATE TABLE users;
-TRUNCATE TABLE links;
-TRUNCATE TABLE plugin_schema_versions;
-SET FOREIGN_KEY_CHECKS = 1;' > ${OUTPUT_FILE}
+    ALTER TABLE users ADD COLUMN default_project_id INT DEFAULT 0;
+    ALTER TABLE users ADD COLUMN is_project_admin INT DEFAULT 0;
+    ALTER TABLE tasks ADD COLUMN estimate_duration VARCHAR(255) DEFAULT "";
+    ALTER TABLE tasks ADD COLUMN actual_duration VARCHAR(255) DEFAULT "";
+    ALTER TABLE project_has_users ADD COLUMN id INT DEFAULT 0;
+    ALTER TABLE project_has_users ADD COLUMN is_owner INT DEFAULT 0;
+    SET FOREIGN_KEY_CHECKS = 0;
+    TRUNCATE TABLE settings;
+    TRUNCATE TABLE users;
+    TRUNCATE TABLE links;
+    TRUNCATE TABLE plugin_schema_versions;
+    SET FOREIGN_KEY_CHECKS = 1;' > ${OUTPUT_FILE}
     
     sqlite_dump_data ${sqliteDbFile} >> ${OUTPUT_FILE}
     
@@ -187,10 +198,19 @@ SET FOREIGN_KEY_CHECKS = 1;' > ${OUTPUT_FILE}
     ALTER TABLE project_has_users DROP COLUMN id;
     ALTER TABLE project_has_users DROP COLUMN is_owner;' >> ${OUTPUT_FILE}
     
+    # For MySQL, we need to double the anti-slash (\\ instead of \)
+    # But we need to take care of Windows URL (e.g. C:\test\) in the JSON of project_activities (e.g. C:\test\" shall not become C:\\test\\" this will break the json...). Windows URL are transformed into Linux URL for this reason
     cat ${OUTPUT_FILE} \
+        | sed -e 's/\\\\"/"/g' \
+        | sed -e 's/\\\\/\//g' \
+        | sed -e 's/\\"/##"/g' \
+        | sed -e 's/\\u\([[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]]\)/##u\1/g' \
         | sed -e 's/\\/\//g' \
+        | sed -e 's/##"/\\\\"/g' \
+        | sed -e 's/##u\([[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]]\)/\\u\1/g' \
         | sed -e 's/\/Kanboard\/Action\//\\\\Kanboard\\\\Action\\\\/g' \
-        | sed -e 's/\/u00/\\\\u00/g' \
+        | sed -e 's/\/r\/n/\\\\n/g' \
+        | sed -e 's/\/\//\//g' \
         > db.mysql
     mv db.mysql ${OUTPUT_FILE}
 }
@@ -205,7 +225,11 @@ generateMysqlSchema()
 
 fillMysqlDb()
 {
-    mysql -h ${DB_HOSTNAME} -u ${DB_USERNAME} --password=${DB_PASSWORD} ${DB_NAME} \
+    local verbosity=
+    if [ "1" == "${IS_VERBOSE}" ]; then
+        verbosity="--verbose"
+    fi
+    mysql ${verbosity} -h ${DB_HOSTNAME} -u ${DB_USERNAME} --password=${DB_PASSWORD} ${DB_NAME} \
         < ${OUTPUT_FILE}
 }
 
@@ -232,3 +256,5 @@ main()
     fi
 }
 main
+
+
