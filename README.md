@@ -23,8 +23,8 @@ First get kanboard-sqlite2mysql:
 
     git clone https://github.com/oliviermaridat/kanboard-sqlite2mysql
     cd kanboard-sqlite2mysql
-    chmod u+x kanbord-sqlite2mysql.sh
-    chmod u+x kanbord-backup.sh
+    chmod u+x kanboard-sqlite2mysql.sh
+    chmod u+x kanboard-backup.sh
     
 Then backup your Kanboard data:
 
@@ -32,11 +32,11 @@ Then backup your Kanboard data:
 
 And finally create the SQL dump file compatible with MySQL:
 
-    ./kanbord-sqlite2mysql.sh <Kanboard instance physical path> -o db-mysql.sql
+    ./kanboard-sqlite2mysql.sh <Kanboard instance physical path> -o db-mysql.sql
 
 Or you can also directly apply it to the MySQL database of your choice:
 
-    ./kanbord-sqlite2mysql.sh <Kanboard instance physical path> <MySQL DB name> [ -h <MySQL DB host> -u <MySQL DB user> -p ]
+    ./kanboard-sqlite2mysql.sh <Kanboard instance physical path> <MySQL DB name> [ -h <MySQL DB host> -u <MySQL DB user> -p ]
 
 Running this script may take 2 or 3 minutes.
 
