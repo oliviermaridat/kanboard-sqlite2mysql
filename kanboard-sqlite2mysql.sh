@@ -188,6 +188,8 @@ createMysqlDump()
     TRUNCATE TABLE plugin_schema_versions;
     SET FOREIGN_KEY_CHECKS = 1;' > ${OUTPUT_FILE}
     
+    echo 'ALTER TABLE `tasks` CHANGE `column_id` `column_id` INT( 11 ) NULL;' >> ${OUTPUT_FILE}
+
     sqlite_dump_data ${sqliteDbFile} >> ${OUTPUT_FILE}
     
     echo 'ALTER TABLE users DROP COLUMN is_admin;
@@ -198,6 +200,8 @@ createMysqlDump()
     ALTER TABLE project_has_users DROP COLUMN id;
     ALTER TABLE project_has_users DROP COLUMN is_owner;' >> ${OUTPUT_FILE}
     
+    echo 'ALTER TABLE `tasks` CHANGE `column_id` `column_id` INT( 11 ) NOT NULL;' >> ${OUTPUT_FILE}
+
     # For MySQL, we need to double the anti-slash (\\ instead of \)
     # But we need to take care of Windows URL (e.g. C:\test\) in the JSON of project_activities (e.g. C:\test\" shall not become C:\\test\\" this will break the json...). Windows URL are transformed into Linux URL for this reason
     cat ${OUTPUT_FILE} \
