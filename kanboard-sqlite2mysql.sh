@@ -190,6 +190,11 @@ createMysqlDump()
     ALTER TABLE tasks ADD COLUMN actual_duration VARCHAR(255) DEFAULT "";
     ALTER TABLE project_has_users ADD COLUMN id INT DEFAULT 0;
     ALTER TABLE project_has_users ADD COLUMN is_owner INT DEFAULT 0;
+    ALTER TABLE projects ADD COLUMN is_everybody_allowed TINYINT(1) DEFAULT 0;
+    ALTER TABLE projects ADD COLUMN default_swimlane VARCHAR(200) DEFAULT "Default swimlane";
+    ALTER TABLE projects ADD COLUMN show_default_swimlane INT DEFAULT 1;
+    ALTER TABLE tasks DROP FOREIGN KEY tasks_swimlane_ibfk_1;
+
     SET FOREIGN_KEY_CHECKS = 0;
     TRUNCATE TABLE settings;
     TRUNCATE TABLE users;
@@ -207,9 +212,14 @@ createMysqlDump()
     ALTER TABLE tasks DROP COLUMN estimate_duration;
     ALTER TABLE tasks DROP COLUMN actual_duration;
     ALTER TABLE project_has_users DROP COLUMN id;
-    ALTER TABLE project_has_users DROP COLUMN is_owner;' >> ${OUTPUT_FILE}
+    ALTER TABLE project_has_users DROP COLUMN is_owner;
+    ALTER TABLE projects DROP COLUMN is_everybody_allowed;
+    ALTER TABLE projects DROP COLUMN default_swimlane;
+    ALTER TABLE projects DROP COLUMN show_default_swimlane;' >> ${OUTPUT_FILE}
     
-    echo 'ALTER TABLE `tasks` CHANGE `column_id` `column_id` INT( 11 ) NOT NULL;' >> ${OUTPUT_FILE}
+    #echo 'ALTER TABLE `tasks` CHANGE `column_id` `column_id` INT( 11 ) NOT NULL;' >> ${OUTPUT_FILE}
+
+    echo 'ALTER TABLE tasks ADD CONSTRAINT tasks_swimlane_ibfk_1 FOREIGN KEY (swimlane_id) REFERENCES swimlanes(id) ON DELETE CASCADE;' >> ${OUTPUT_FILE}
 
     # For MySQL, we need to double the anti-slash (\\ instead of \)
     # But we need to take care of Windows URL (e.g. C:\test\) in the JSON of project_activities (e.g. C:\test\" shall not become C:\\test\\" this will break the json...). Windows URL are transformed into Linux URL for this reason
