@@ -152,6 +152,15 @@ sqlite_dump_table_data()
         | sed -e "s/INSERT INTO \([a-z_]*\)/INSERT INTO \1 (${columns})/"
 }
 
+# If verbose, displays version of the schema found in the SQLite file. Beware this version is different from MySQL schema versions
+sqlite_dump_schemaversion()
+{
+    local sqliteDbFile=$1
+    if [ "1" == "${IS_VERBOSE}" ]; then
+        echo "# Found schema version `sqlite3 ${sqliteDbFile} 'PRAGMA user_version'` for SQLite"
+    fi
+}
+
 # Generate "INSERT INTO" queries to dump data of a SQLite database
 # * @param Database file
 sqlite_dump_data()
@@ -241,6 +250,8 @@ main()
 {
     cmdline $ARGS
     local sqliteDbFile=${KANBOARD_PATH}/data/db.sqlite
+
+    sqlite_dump_schemaversion ${sqliteDbFile}
     
     echo '# Create MySQL data dump from SQLite database'
     createMysqlDump ${sqliteDbFile} \
