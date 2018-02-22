@@ -47,7 +47,8 @@ Or you can also directly apply it to the MySQL database of your choice:
 
 Running this script may take 2 or 3 minutes.
 
-Its now time to create a new ticket to say if it worked or failed, to precise which version of SQLite / MySQL / Kanboard / OS your were using. Thank you!
+Did it failed? Check for [manual solutions](https://github.com/oliviermaridat/kanboard-sqlite2mysql/labels/Solution) or read the technical details below.
+Anyway, its now time to create a new ticket to say if it worked or failed, to precise which version of SQLite / MySQL / Kanboard / OS your were using. Thank you!
 
 Steps to reproduce
 ------------------------
