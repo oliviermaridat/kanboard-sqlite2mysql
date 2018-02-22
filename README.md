@@ -8,16 +8,23 @@ Requirements
 
 * SQLite3
 * A [Kanboard](https://github.com/fguillot/kanboard) instance (to generate the MySQL schema)
+* Zip (for backup script only, otherwize, manually backup your instance)
 
 This script is generating a SQL data dump compatible with MySQL. The resulting SQL data dump file can be used to import data into a MySQL database. This script can also do that automatically.
 
-It works on Linux Debian Stretch for SQLite 3.11, MySQL 14.14 and Kanboard 1.0.27 with or without plugins.
+This tool has been tested on GNU/Linux Debian Jessie (SQLite 2.8.17, MariaDB 10.0.23) and GNU/Linux Debian Stretch (SQLite 3.11, MySQL 14.14).
 It should also work on Windows (with Cygwin or Mysys), with MariaDB, maybe Postgres.
+
+* [Version 1.1.1 of this tool](https://github.com/oliviermaridat/kanboard-sqlite2mysql/releases/tag/v1.1.1) has been tested to migrate successfuly to Kanboard 1.1.1 (SQLite schema version 116 to MySQL schema version 126) with or without plugins.
+* [Version 1.0.34 of this tool](https://github.com/oliviermaridat/kanboard-sqlite2mysql/releases/tag/v1.1.1) has been tested to migrate successfuly to Kanboard 1.0.34 with or without plugins.
+* [Version 1.0.27 of this tool](https://github.com/oliviermaridat/kanboard-sqlite2mysql/releases/tag/v1.1.1) has been tested to migrate successfuly to Kanboard 1.0.27 with or without plugins.
 
 Usage
 ------------------------
 
 **/!\ Please, please, PLEASE, BACKUP YOUR before to do anything else. TEST THIS SCRIPT IN A DUMMY KANBOARD WITH A DUMMY MYSQL DATABASE AND VERIFY THE RESULT before to do anything in your production environment! You have been advised;-)**
+
+Since the [latest version of this tool ](https://github.com/oliviermaridat/kanboard-sqlite2mysql/releases/latest) has only been tested until Kanboard 1.1.1, if you are running a Kanboard instance lower than 1.1.1, **it is recommanded to update your SQLite Kanboard instance to 1.1.1, make the conversion to MySQL using this script, and then finish the update to the last version of Kanboard**. If you are already running a Kanboard instance higher than 1.1.1, let's give it a try! Any success or failure feedback for version higher than 1.1.1 is really welcome! Thanks.
 
 First get kanboard-sqlite2mysql:
 
