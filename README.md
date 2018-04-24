@@ -14,7 +14,7 @@ This script is generating a SQL data dump compatible with MySQL. The resulting S
 
 This tool has been tested on GNU/Linux Debian Jessie (SQLite 2.8.17, MariaDB 10.0.23) and GNU/Linux Debian Stretch (SQLite 3.11, MySQL 14.14).
 It should also work on Windows (with Cygwin or Mysys), with MariaDB, maybe Postgres.
-
+* [Version 1.1.1 of this tool](https://github.com/oliviermaridat/kanboard-sqlite2mysql/releases/tag/v1.1.1) has been tested to migrate successfuly to Kanboard 1.2.2 (SQLite schema version 117 to MySQL schema version 127) with or without plugins.
 * [Version 1.1.1 of this tool](https://github.com/oliviermaridat/kanboard-sqlite2mysql/releases/tag/v1.1.1) has been tested to migrate successfuly to Kanboard 1.1.1 (SQLite schema version 116 to MySQL schema version 126) with or without plugins.
 * [Version 1.0.34 of this tool](https://github.com/oliviermaridat/kanboard-sqlite2mysql/releases/tag/v1.1.1) has been tested to migrate successfuly to Kanboard 1.0.34 with or without plugins.
 * [Version 1.0.27 of this tool](https://github.com/oliviermaridat/kanboard-sqlite2mysql/releases/tag/v1.1.1) has been tested to migrate successfuly to Kanboard 1.0.27 with or without plugins.
@@ -40,6 +40,15 @@ Then backup your Kanboard data:
 And finally create the SQL dump file compatible with MySQL:
 
     ./kanboard-sqlite2mysql.sh <Kanboard instance physical path> -o db-mysql.sql
+
+Optional step for non-latic table data.
+
+Choose encoding according to encoding of your database. Add these lines with right encoding at the start of dump-file:
+> SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
+> 
+> SET CHARACTER SET 'utf8mb4';
+> 
+> SET SESSION collation_connection = 'utf8mb4_general_ci';
 
 Or you can also directly apply it to the MySQL database of your choice:
 
