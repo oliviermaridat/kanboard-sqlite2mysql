@@ -149,7 +149,7 @@ sqlite_dump_table_data()
     
     echo -e ".mode insert ${table}\nselect * from ${table};" \
         | sqlite3 ${sqliteDbFile} \
-        | sed -e "s/INSERT INTO \([a-z_]*\)/INSERT INTO \1 (${columns})/"
+        | sed -e "s/INSERT INTO \([a-z_\"]*\)/INSERT INTO \1 (${columns})/"
 }
 
 # If verbose, displays version of the schema found in the SQLite file. Beware this version is different from MySQL schema versions
