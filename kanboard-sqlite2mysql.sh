@@ -123,7 +123,7 @@ sqlite_tables()
 {
     local sqliteDbFile=$1
     sqlite3 ${sqliteDbFile} .schema \
-        | sed -e '/[^C(]$/d' -e 's/CREATE TABLE \([a-z_]*\).*/\1/' -e '/^$/d'
+        | sed -e '/[^C(]$/d' -e '/^\s\+($/d' -e 's/CREATE TABLE \([a-z_]*\).*/\1/' -e '/^$/d'
 }
 
 # List column names of a SQLite table
