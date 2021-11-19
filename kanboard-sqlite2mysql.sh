@@ -26,7 +26,7 @@ usage()
 version()
 {
 	cat <<- EOF
-	Kanboard SQLite2MySQL 0.0.1
+	Kanboard SQLite2MySQL 1.1.2
 	Migrate your SQLite Kanboard database to MySQL in one go! By Olivier.
 	EOF
 }

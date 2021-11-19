@@ -19,7 +19,7 @@ usage()
 version()
 {
 	cat <<- EOF
-	Kanboard backup 0.0.1
+	Kanboard backup 1.1.2
 	Backup your Kanboard in one go! By Olivier.
 	EOF
 }

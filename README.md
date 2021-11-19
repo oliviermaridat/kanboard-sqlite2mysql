@@ -14,6 +14,7 @@ This script is generating a SQL data dump compatible with MySQL. The resulting S
 
 This tool has been tested on GNU/Linux Debian Jessie (SQLite 2.8.17, MariaDB 10.0.23) and GNU/Linux Debian Stretch (SQLite 3.11, MySQL 14.14).
 It should also work on Windows (with Cygwin or Mysys), with MariaDB, maybe Postgres.
+* [Version 1.1.1 of this tool](https://github.com/oliviermaridat/kanboard-sqlite2mysql/releases/tag/v1.1.1) has been tested to migrate successfuly to Kanboard 1.2.19. See details [here](https://github.com/oliviermaridat/kanboard-sqlite2mysql/issues/30) and [here](https://github.com/oliviermaridat/kanboard-sqlite2mysql/issues/26).
 * [Version 1.1.1 of this tool](https://github.com/oliviermaridat/kanboard-sqlite2mysql/releases/tag/v1.1.1) has been tested to migrate successfuly to Kanboard 1.2.2 (SQLite schema version 117 to MySQL schema version 127) with or without plugins.
 * [Version 1.1.1 of this tool](https://github.com/oliviermaridat/kanboard-sqlite2mysql/releases/tag/v1.1.1) has been tested to migrate successfuly to Kanboard 1.1.1 (SQLite schema version 116 to MySQL schema version 126) with or without plugins.
 * [Version 1.0.34 of this tool](https://github.com/oliviermaridat/kanboard-sqlite2mysql/releases/tag/v1.1.1) has been tested to migrate successfuly to Kanboard 1.0.34 with or without plugins.
@@ -32,7 +33,7 @@ First get kanboard-sqlite2mysql:
     cd kanboard-sqlite2mysql
     chmod u+x kanboard-sqlite2mysql.sh
     chmod u+x kanboard-backup.sh
-    
+
 Then backup your Kanboard data:
 
     ./kanboard-backup.sh <Kanboard instance physical path>
@@ -44,6 +45,7 @@ And finally create the SQL dump file compatible with MySQL:
 Optional step for non-latic table data.
 
 Choose encoding according to encoding of your database. Add these lines with right encoding at the start of dump-file:
+
 > SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
 > 
 > SET CHARACTER SET 'utf8mb4';
@@ -71,11 +73,13 @@ Migrate from a SQLite to a MySQL or MariaDB database is not straightforward and 
  * The order of the columns is not the same
 
 The main idea of this script is:
+
 * Generate a SQL dump file (compatible with MySQL) with only Kanboard data (i.e. "INSERT INTO" queries)
 * Use a Kanboard instance to create the table in a MySQL database
 * Import this SQL dump file into the MySQL database  
 
 All required steps are listed below:
+
 * Create an SQL dump from the SQLite database, for example using `sqlite3 data/db.sqlite .dump > db-mysql.sql`. Actually, this script is using something more complex in order to reorder tables.
 * Change this SQL dump to something working with MySQL using a script (to be done)
  * Replace \ by /
@@ -90,7 +94,7 @@ All required steps are listed below:
     TRUNCATE TABLE links;
     TRUNCATE TABLE plugin_schema_versions;
     SET FOREIGN_KEY_CHECKS = 1;
-    
+
 * Add temporarily (and remove afterwards) missing columns in the MySQL database
  * users: is_admin, default_project_id, is_admin_project
  
@@ -116,8 +120,7 @@ All required steps are listed below:
     
     ALTER TABLE project_has_users DROP COLUMN id;
     ALTER TABLE project_has_users DROP COLUMN is_owner;
-    
-    
+
 License
 --------------------------------
 
@@ -126,5 +129,3 @@ This script is distributed under the LGPL3+ license.
 Please feel free to contribute.
 
 If you have any ideas, critiques, suggestions or whatever you want to call it, please open an issue. I'll be happy to hear from you what you'd see in this tool.
-
-
