@@ -166,7 +166,7 @@ sqlite_dump_schemaversion()
 sqlite_dump_data()
 {
     local sqliteDbFile=$1
-    local prioritizedTables='plugin_schema_versions projects columns links groups users tasks task_has_links subtasks comments actions'
+    local prioritizedTables='plugin_schema_versions projects columns links groups users tasks task_has_links task_has_files subtasks comments actions'
     for t in $prioritizedTables; do
         # Please do not ask why: this TRUNCATE is already done elsewhere, but this table "plugin_schema_versions" seems to be refillld I don't know where... This fix the issue
         if [ "plugin_schema_versions" == "${t}" ]; then
@@ -174,7 +174,7 @@ sqlite_dump_data()
         fi
         sqlite_dump_table_data ${sqliteDbFile} ${t}
     done
-    for t in $(sqlite_tables ${sqliteDbFile} | sed -e '/^plugin_schema_versions$/d' -e '/^projects$/d' -e '/^columns$/d' -e '/^links$/d' -e '/^groups$/d' -e '/^users$/d' -e '/^tasks$/d' -e '/^task_has_links$/d' -e '/^subtasks$/d' -e '/^comments$/d' -e '/^actions$/d'); do
+    for t in $(sqlite_tables ${sqliteDbFile} | sed -e '/^plugin_schema_versions$/d' -e '/^projects$/d' -e '/^columns$/d' -e '/^links$/d' -e '/^groups$/d' -e '/^users$/d' -e '/^tasks$/d' -e '/^task_has_links$/d' -e '/^task_has_files$/d' -e '/^subtasks$/d' -e '/^comments$/d' -e '/^actions$/d'); do
         sqlite_dump_table_data ${sqliteDbFile} ${t}
     done
 }
@@ -281,5 +281,3 @@ main()
     fi
 }
 main
-
-
